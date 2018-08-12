@@ -1,5 +1,9 @@
 A small DSL to generate syntax diagrams using [this library](https://github.com/lukaslueg/railroad).
 
+**[Some examples](https://htmlpreview.github.io/?https://github.com/lukaslueg/railroad_dsl/blob/master/examples/example_diagrams.html)**
+
+--
+
 * `{...}` is a horizontal stack of connected elements
 * `[...]` is a vertical sequence of connected elements
 * `<...>` is a choice of multiple options, exactly one of which has to be picked
