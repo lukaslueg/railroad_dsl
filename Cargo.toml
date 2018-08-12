@@ -1,0 +1,11 @@
+[package]
+name = "railroad_dsl"
+version = "0.1.0"
+authors = ["Lukas Lueg <lukas.lueg@gmail.com>"]
+
+[dependencies.nom]
+version = "4.0"
+features = ["verbose-errors"]
+
+[dependencies.railroad]
+git = "https://github.com/lukaslueg/railroad"
