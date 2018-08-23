@@ -176,12 +176,23 @@ complete_named!(lbox_expr<Expr>,
     )
 );
 
-complete_named!(root_expr<Expr>, terminated!(lbox_expr, eof!()));
+complete_named!(root_expr<Vec<Expr>>, terminated!(many1!(lbox_expr), eof!()));
 
-pub fn compile(src: &str) -> Result<(i64, i64, railroad::Diagram<railroad::Sequence>), nom::Err<nom::types::CompleteStr>> {
-    let (unparsed, tree) = root_expr(nom::types::CompleteStr(src))?;
+fn start_to_end(root: Box<railroad::RailroadNode>) -> Box<railroad::RailroadNode> {
+    Box::new(railroad::Sequence::new(vec![Box::new(railroad::SimpleStart), root, Box::new(railroad::SimpleEnd)]))
+}
+
+pub fn compile(src: &str) -> Result<(i64, i64, railroad::Diagram<Box<railroad::RailroadNode>>), nom::Err<nom::types::CompleteStr>> {
+    let (unparsed, mut trees) = root_expr(nom::types::CompleteStr(src))?;
     assert!(unparsed.is_empty());
-    let root = railroad::Sequence::new(vec![Box::new(railroad::SimpleStart), tree.into(), Box::new(railroad::SimpleEnd)]);
+    let root = if trees.len() == 1 {
+        start_to_end(trees.remove(0).into())
+    } else {
+        Box::new(railroad::VerticalGrid::new(
+                trees.into_iter()
+                     .map(|tree| start_to_end(tree.into()))
+                     .collect()))
+    };
     let dia = railroad::Diagram::with_default_css(root);
     let width = (&dia as &railroad::RailroadNode).width();
     let height = (&dia as &railroad::RailroadNode).height();
