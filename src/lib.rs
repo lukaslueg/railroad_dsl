@@ -13,9 +13,16 @@ use pest::iterators::Pair;
 struct RRParser;
 
 fn unescape(pair: Pair<Rule>) -> String {
-    // TODO
     let s = pair.as_str();
-    s[1..s.len()-1].into()
+    let mut result = String::with_capacity(s.len());
+    let mut iter = s[1..s.len()-1].chars();
+    while let Some(ch) = iter.next() {
+        result.push(match ch {
+            '\\' => iter.next().expect("no escaped char?"),
+            _ => ch
+        });
+    }
+    result
 }
 
 fn binary<F, T>(pair: Pair<Rule>, f: F) -> Box<rr::RailroadNode>

@@ -1,8 +1,8 @@
 WHITESPACE  = _{ " " | "\t" | "\n" }
 
-term        = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
-nonterm     = @{ "'"  ~ (!"'" ~ ANY)*  ~ "'" }
-comment     = @{ "`"  ~ (!"`" ~ ANY)*  ~ "`" }
+term        = @{ "\"" ~ ("\\" ~ ANY | !"\"" ~ ANY)* ~ "\"" }
+nonterm     = @{ "'"  ~ ("\\" ~ ANY | !"'" ~ ANY)*  ~ "'" }
+comment     = @{ "`"  ~ ("\\" ~ ANY | !"`" ~ ANY)*  ~ "`" }
 empty       = @{ "!" }
 
 sequence    =  { "[" ~ list ~ "]" }
