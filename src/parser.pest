@@ -5,10 +5,10 @@ nonterm     = @{ "'"  ~ ("\\" ~ ANY | !"'" ~ ANY)*  ~ "'" }
 comment     = @{ "`"  ~ ("\\" ~ ANY | !"`" ~ ANY)*  ~ "`" }
 empty       = @{ "!" }
 
-sequence    =  { "[" ~ list ~ "]" }
-stack       =  { "{" ~ list ~ "}" }
-choice      =  { "<" ~ list ~ ">" }
-list        = _{ lbox_expr ~ ("," ~ lbox_expr)* }
+sequence    =  { "[" ~ lbox_expr* ~ "]" }
+stack       =  { "{" ~ comma_list ~ "}" }
+choice      =  { "<" ~ comma_list ~ ">" }
+comma_list  = _{ lbox_expr ~ ("," ~ lbox_expr)* }
 
 simple_expr = _{ term | nonterm | comment | sequence | stack | choice | empty }
 qmark       =  { "?" }
