@@ -1,0 +1,21 @@
+WHITESPACE  = _{ " " | "\t" | "\n" }
+
+term        = @{ "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
+nonterm     = @{ "'"  ~ (!"'" ~ ANY)*  ~ "'" }
+comment     = @{ "`"  ~ (!"`" ~ ANY)*  ~ "`" }
+empty       = @{ "!" }
+
+sequence    =  { "[" ~ list ~ "]" }
+stack       =  { "{" ~ list ~ "}" }
+choice      =  { "<" ~ list ~ ">" }
+list        = _{ lbox_expr ~ ("," ~ lbox_expr)* }
+
+simple_expr = _{ term | nonterm | comment | sequence | stack | choice | empty }
+qmark       =  { "?" }
+opt_expr    =  { simple_expr ~ qmark? }
+rpt_expr    =  { opt_expr ~ ("*" ~ opt_expr)? }
+
+lbox_expr   =  { rpt_expr ~ ("#" ~ rpt_expr)? }
+
+root_expr   = _{ lbox_expr+ }
+input       = _{ root_expr ~ EOI }

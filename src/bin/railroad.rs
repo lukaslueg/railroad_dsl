@@ -3,7 +3,6 @@ extern crate railroad_dsl;
 #[macro_use]
 extern crate structopt;
 
-use std::error::Error;
 use std::fs;
 use std::path::PathBuf;
 use std::io::{self, Read};
@@ -21,14 +20,16 @@ struct Options {
 }
 
 
-fn main() -> Result<(), Box<Error>> {
+fn main() {
     let args = Options::from_args();
     if args.inputs.is_empty() {
         let mut buf = String::new();
-        io::stdin().read_to_string(&mut buf)?;
-        match railroad_dsl::compile(&buf) {
-            Err(e) => eprintln!("syntax error:\n{}", e),
-            Ok((_, _, diagram)) => println!("{}", diagram),
+        match io::stdin().read_to_string(&mut buf) {
+            Err(e) => eprintln!("error reading stdin: {}", e),
+            Ok(_) => match railroad_dsl::compile(&buf) {
+                Err(e) => eprintln!("syntax error:\n{}", e.with_path("<stdin>")),
+                Ok((_, _, diagram)) => println!("{}", diagram),
+            }
         }
     } else {
         for input in args.inputs {
@@ -36,7 +37,7 @@ fn main() -> Result<(), Box<Error>> {
             match fs::read_to_string(&input) {
                 Err(e) => eprintln!("error reading file {}: {}", input, e),
                 Ok(buf) => match railroad_dsl::compile(&buf) {
-                    Err(e) => eprintln!("syntax error:\n{}", e),
+                    Err(e) => eprintln!("syntax error:\n{}", e.with_path(&input)),
                     Ok((_, _, diagram)) => match fs::write(&output, format!("{}", diagram)) {
                         Err(e) => eprintln!("error writing file {}: {}", output.display(), e),
                         Ok(_) => ()
@@ -45,5 +46,4 @@ fn main() -> Result<(), Box<Error>> {
             }
         }
     }
-    Ok(())
 }

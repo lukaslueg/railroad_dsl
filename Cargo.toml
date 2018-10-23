@@ -4,11 +4,9 @@ version = "0.1.0"
 authors = ["Lukas Lueg <lukas.lueg@gmail.com>"]
 
 [dependencies]
+pest = "2.0"
+pest_derive = "2.0"
 structopt = "0.2.12"
-
-[dependencies.nom]
-version = "4.0"
-features = ["verbose-errors"]
 
 [dependencies.railroad]
 git = "https://github.com/lukaslueg/railroad"
