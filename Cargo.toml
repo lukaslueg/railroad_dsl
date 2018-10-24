@@ -2,6 +2,8 @@
 name = "railroad_dsl"
 version = "0.1.0"
 authors = ["Lukas Lueg <lukas.lueg@gmail.com>"]
+license = "MIT"
+description = "A small DSL to generate syntax-diagrams"
 
 [dependencies]
 pest = "2.0"
