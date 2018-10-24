@@ -14,6 +14,8 @@ A small DSL to generate syntax diagrams using [this library](https://github.com/
 * `...*...` is a repeated element
 * `!` is the empty element
 
+Quotes (and backslashes) can be escaped using backslashes.
+
 For example:
 
 ```

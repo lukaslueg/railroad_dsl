@@ -1,1 +1,1 @@
-["VACUUM", <!#`Vacuum current database`, "schema-name"#`The database named ...`>]
+["VACUUM" <!#`Vacuum current database`, "schema-name"#`The database named ...`>]
