@@ -9,6 +9,4 @@ description = "A small DSL to generate syntax-diagrams"
 pest = "2.0"
 pest_derive = "2.0"
 structopt = "0.2.12"
-
-[dependencies.railroad]
-git = "https://github.com/lukaslueg/railroad"
+railroad = "0.1"
