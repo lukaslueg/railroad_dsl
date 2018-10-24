@@ -4,6 +4,9 @@ version = "0.1.0"
 authors = ["Lukas Lueg <lukas.lueg@gmail.com>"]
 license = "MIT"
 description = "A small DSL to generate syntax-diagrams"
+exclude = ["examples/*.html", "examples/*.jpeg"]
+repository = "https://github.com/lukaslueg/railroad_dsl"
+readme = "README.md"
 
 [dependencies]
 pest = "2.0"
