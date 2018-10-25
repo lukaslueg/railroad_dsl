@@ -2,6 +2,7 @@ extern crate railroad_dsl;
 // keeps compatibility with current stable, but unused on nightly
 #[macro_use]
 extern crate structopt;
+extern crate pest;
 
 use std::fs;
 use std::path::PathBuf;
@@ -19,31 +20,68 @@ struct Options {
     inputs: Vec<String>,
 }
 
+enum Error {
+    Parser(pest::error::Error<railroad_dsl::Rule>),
+    IO(io::Error),
+}
 
-fn main() {
-    let args = Options::from_args();
-    if args.inputs.is_empty() {
-        let mut buf = String::new();
-        match io::stdin().read_to_string(&mut buf) {
-            Err(e) => eprintln!("error reading stdin: {}", e),
-            Ok(_) => match railroad_dsl::compile(&buf) {
-                Err(e) => eprintln!("syntax error:\n{}", e.with_path("<stdin>")),
-                Ok((_, _, diagram)) => println!("{}", diagram),
+fn dia_from_stdin() -> Result<(), Error> {
+    let mut buf = String::new();
+    match io::stdin().read_to_string(&mut buf) {
+        Err(e) => {
+            eprintln!("error reading stdin: {}", e);
+            Err(Error::IO(e))
+        },
+        Ok(_) => match railroad_dsl::compile(&buf) {
+            Err(e) => {
+                eprintln!("syntax error:\n{}", e.clone().with_path("<stdin>"));
+                Err(Error::Parser(e))
+            },
+            Ok((_, _, diagram)) => {
+                println!("{}", diagram);
+                Ok(())
             }
         }
-    } else {
-        for input in args.inputs {
-            let output = PathBuf::from(&input).with_extension("svg");
-            match fs::read_to_string(&input) {
-                Err(e) => eprintln!("error reading file {}: {}", input, e),
-                Ok(buf) => match railroad_dsl::compile(&buf) {
-                    Err(e) => eprintln!("syntax error:\n{}", e.with_path(&input)),
-                    Ok((_, _, diagram)) => match fs::write(&output, format!("{}", diagram)) {
-                        Err(e) => eprintln!("error writing file {}: {}", output.display(), e),
-                        Ok(_) => ()
+    }
+}
+
+fn dia_from_files(inputs: &[String]) -> Result<(), Error> {
+    let mut err = Ok(());
+    for input in inputs {
+        let output = PathBuf::from(&input).with_extension("svg");
+        match fs::read_to_string(&input) {
+            Err(e) => {
+                eprintln!("error reading file {}: {}", input, e);
+                err = Err(Error::IO(e));
+            }
+            Ok(buf) => match railroad_dsl::compile(&buf) {
+                Err(e) => {
+                    eprintln!("syntax error:\n{}", e.clone().with_path(&input));
+                    err = Err(Error::Parser(e));
+                }
+                Ok((_, _, diagram)) => {
+                    if let Err(e) = fs::write(&output, format!("{}", diagram)) {
+                        eprintln!("error writing file {}: {}", output.display(), e);
+                        err = Err(Error::IO(e));
                     }
                 }
             }
         }
+    }
+    err
+}
+
+fn run(args: &Options) -> Result<(), Error> {
+    if args.inputs.is_empty() {
+        dia_from_stdin()
+    } else {
+        dia_from_files(&args.inputs)
+    }
+}
+
+fn main() {
+    let opts = Options::from_args();
+    if run(&opts).is_err() {
+        ::std::process::exit(1);
     }
 }

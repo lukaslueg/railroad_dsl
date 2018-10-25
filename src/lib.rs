@@ -12,7 +12,7 @@ use pest::iterators::Pair;
 #[grammar = "parser.pest"]
 struct RRParser;
 
-fn unescape(pair: Pair<Rule>) -> String {
+fn unescape(pair: &Pair<Rule>) -> String {
     let s = pair.as_str();
     let mut result = String::with_capacity(s.len());
     let mut iter = s[1..s.len()-1].chars();
@@ -41,9 +41,9 @@ where T: rr::RailroadNode + 'static,
 fn make_node(pair: Pair<Rule>) -> Box<rr::RailroadNode> {
     use Rule::*;
     match pair.as_rule() {
-        term      => Box::new(rr::Terminal::new(unescape(pair))),
-        nonterm   => Box::new(rr::NonTerminal::new(unescape(pair))),
-        comment   => Box::new(rr::Comment::new(unescape(pair))),
+        term      => Box::new(rr::Terminal::new(unescape(&pair))),
+        nonterm   => Box::new(rr::NonTerminal::new(unescape(&pair))),
+        comment   => Box::new(rr::Comment::new(unescape(&pair))),
         empty     => Box::new(rr::Empty),
         sequence  => Box::new(rr::Sequence::new(pair.into_inner().map(make_node).collect())),
         stack     => Box::new(rr::Stack::new(pair.into_inner().map(make_node).collect())),
