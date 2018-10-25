@@ -74,3 +74,31 @@ pub fn compile(src: &str) -> Result<(i64, i64, rr::Diagram<Box<rr::RailroadNode>
     let height = (&dia as &rr::RailroadNode).height();
     Ok((width, height, dia))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::env;
+    use std::fs;
+    use std::io::Read;
+    use std::path;
+
+    #[test]
+    fn examples_must_parse() {
+        let home = env::var_os("CARGO_MANIFEST_DIR").unwrap();
+        let mut exmpl_dir = path::PathBuf::from(home);
+        exmpl_dir.push("examples");
+        for path in fs::read_dir(exmpl_dir).unwrap().into_iter().filter_map(|d| d.ok()) {
+            if let Some(filename) = path.file_name().to_str() {
+                if filename.ends_with("diagram.txt") {
+                    eprintln!("Compiling `{}`", filename);
+                    let mut buffer = String::new();
+                    fs::File::open(path.path()).unwrap().read_to_string(&mut buffer).unwrap();
+                    if let Err(e) = compile(&buffer) {
+                        panic!("Failed to compile {}", e.with_path(filename));
+                    }
+                }
+            }
+        }
+    }
+}
