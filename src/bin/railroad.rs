@@ -1,6 +1,4 @@
 extern crate railroad_dsl;
-// keeps compatibility with current stable, but unused on nightly
-#[macro_use]
 extern crate structopt;
 extern crate pest;
 

@@ -7,9 +7,13 @@ description = "A small DSL to generate syntax-diagrams"
 exclude = ["examples/*.html", "examples/*.jpeg"]
 repository = "https://github.com/lukaslueg/railroad_dsl"
 readme = "README.md"
+edition = "2018"
 
 [dependencies]
 pest = "2.0"
 pest_derive = "2.0"
 structopt = "0.2.12"
 railroad = "0.1"
+
+[dev-dependencies]
+htmlescape = "0.3"

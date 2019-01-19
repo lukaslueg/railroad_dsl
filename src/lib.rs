@@ -3,8 +3,6 @@ extern crate pest;
 extern crate pest_derive;
 extern crate railroad as rr;
 
-pub use rr::svg::encode;
-
 use pest::Parser;
 use pest::iterators::Pair;
 
