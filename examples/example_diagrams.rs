@@ -1,5 +1,5 @@
-extern crate railroad_dsl;
-extern crate htmlescape;
+use htmlescape;
+use railroad_dsl;
 
 use std::fs;
 use std::io;
@@ -23,7 +23,11 @@ fn main() -> Result<(), io::Error> {
                 fs::File::open(path.path())?.read_to_string(&mut buffer)?;
                 let (width, _height, dia) = railroad_dsl::compile(&buffer).unwrap();
                 write!(outp, "<h3>Generated from <i>`{}`</i></h3>", filename)?;
-                write!(outp, "<pre>{}</pre><br>", htmlescape::encode_minimal(&buffer))?;
+                write!(
+                    outp,
+                    "<pre>{}</pre><br>",
+                    htmlescape::encode_minimal(&buffer)
+                )?;
                 write!(outp, "<div style=\"width: {}px; height: auto; max-height: 100%, max-width: 100%\">{}</div>", width, dia)?;
                 outp.write_all(b"<hr>")?;
             }

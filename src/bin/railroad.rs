@@ -1,10 +1,10 @@
-extern crate railroad_dsl;
-extern crate structopt;
-extern crate pest;
+use pest;
+use railroad_dsl;
+use structopt;
 
 use std::fs;
-use std::path::PathBuf;
 use std::io::{self, Read};
+use std::path::PathBuf;
 use structopt::StructOpt;
 
 #[derive(StructOpt)]
@@ -29,17 +29,17 @@ fn dia_from_stdin() -> Result<(), Error> {
         Err(e) => {
             eprintln!("error reading stdin: {}", e);
             Err(Error::IO(e))
-        },
+        }
         Ok(_) => match railroad_dsl::compile(&buf) {
             Err(e) => {
                 eprintln!("syntax error:\n{}", e.clone().with_path("<stdin>"));
                 Err(Error::Parser(e))
-            },
+            }
             Ok((_, _, diagram)) => {
                 println!("{}", diagram);
                 Ok(())
             }
-        }
+        },
     }
 }
 
@@ -63,7 +63,7 @@ fn dia_from_files(inputs: &[String]) -> Result<(), Error> {
                         err = Err(Error::IO(e));
                     }
                 }
-            }
+            },
         }
     }
     err
