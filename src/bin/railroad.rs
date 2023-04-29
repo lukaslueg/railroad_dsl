@@ -1,7 +1,3 @@
-use pest;
-use railroad_dsl;
-use structopt;
-
 use std::fs;
 use std::io::{self, Read};
 use std::path::PathBuf;
@@ -19,7 +15,7 @@ struct Options {
 }
 
 enum Error {
-    Parser(pest::error::Error<railroad_dsl::Rule>),
+    Parser(Box<pest::error::Error<railroad_dsl::Rule>>),
     IO(io::Error),
 }
 
@@ -27,7 +23,7 @@ fn dia_from_stdin() -> Result<(), Error> {
     let mut buf = String::new();
     match io::stdin().read_to_string(&mut buf) {
         Err(e) => {
-            eprintln!("error reading stdin: {}", e);
+            eprintln!("error reading stdin: {e}");
             Err(Error::IO(e))
         }
         Ok(_) => match railroad_dsl::compile(&buf) {
@@ -35,8 +31,8 @@ fn dia_from_stdin() -> Result<(), Error> {
                 eprintln!("syntax error:\n{}", e.clone().with_path("<stdin>"));
                 Err(Error::Parser(e))
             }
-            Ok((_, _, diagram)) => {
-                println!("{}", diagram);
+            Ok(diagram) => {
+                println!("{}", diagram.diagram);
                 Ok(())
             }
         },
@@ -47,18 +43,18 @@ fn dia_from_files(inputs: &[String]) -> Result<(), Error> {
     let mut err = Ok(());
     for input in inputs {
         let output = PathBuf::from(&input).with_extension("svg");
-        match fs::read_to_string(&input) {
+        match fs::read_to_string(input) {
             Err(e) => {
-                eprintln!("error reading file {}: {}", input, e);
+                eprintln!("error reading file {input}: {e}");
                 err = Err(Error::IO(e));
             }
             Ok(buf) => match railroad_dsl::compile(&buf) {
                 Err(e) => {
-                    eprintln!("syntax error:\n{}", e.clone().with_path(&input));
+                    eprintln!("syntax error:\n{}", e.clone().with_path(input));
                     err = Err(Error::Parser(e));
                 }
-                Ok((_, _, diagram)) => {
-                    if let Err(e) = fs::write(&output, format!("{}", diagram)) {
+                Ok(diagram) => {
+                    if let Err(e) = fs::write(&output, format!("{}", diagram.diagram)) {
                         eprintln!("error writing file {}: {}", output.display(), e);
                         err = Err(Error::IO(e));
                     }

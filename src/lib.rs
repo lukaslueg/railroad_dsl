@@ -1,4 +1,3 @@
-use pest;
 #[macro_use]
 extern crate pest_derive;
 use railroad as rr;
@@ -9,6 +8,12 @@ use pest::Parser;
 #[derive(Parser)]
 #[grammar = "parser.pest"]
 struct RRParser;
+
+pub struct Diagram {
+    pub width: i64,
+    pub height: i64,
+    pub diagram: rr::Diagram<Box<dyn rr::RailroadNode>>,
+}
 
 fn unescape(pair: &Pair<'_, Rule>) -> String {
     let s = pair.as_str();
@@ -68,9 +73,7 @@ fn start_to_end(root: Box<dyn rr::RailroadNode>) -> Box<dyn rr::RailroadNode> {
     ]))
 }
 
-pub fn compile(
-    src: &str,
-) -> Result<(i64, i64, rr::Diagram<Box<dyn rr::RailroadNode>>), pest::error::Error<Rule>> {
+pub fn compile(src: &str) -> Result<Diagram, Box<pest::error::Error<Rule>>> {
     let mut result = RRParser::parse(Rule::input, src)?;
     let trees = result.next().expect("expected root_expr").into_inner();
     let mut trees: Vec<_> = trees.map(|p| start_to_end(make_node(p))).collect();
@@ -79,10 +82,14 @@ pub fn compile(
     } else {
         Box::new(rr::VerticalGrid::new(trees))
     };
-    let dia = rr::Diagram::with_default_css(root);
-    let width = (&dia as &dyn rr::RailroadNode).width();
-    let height = (&dia as &dyn rr::RailroadNode).height();
-    Ok((width, height, dia))
+    let diagram = rr::Diagram::with_default_css(root);
+    let width = (&diagram as &dyn rr::RailroadNode).width();
+    let height = (&diagram as &dyn rr::RailroadNode).height();
+    Ok(Diagram {
+        width,
+        height,
+        diagram,
+    })
 }
 
 #[cfg(test)]
@@ -98,14 +105,10 @@ mod tests {
         let home = env::var_os("CARGO_MANIFEST_DIR").unwrap();
         let mut exmpl_dir = path::PathBuf::from(home);
         exmpl_dir.push("examples");
-        for path in fs::read_dir(exmpl_dir)
-            .unwrap()
-            .into_iter()
-            .filter_map(|d| d.ok())
-        {
+        for path in fs::read_dir(exmpl_dir).unwrap().filter_map(Result::ok) {
             if let Some(filename) = path.file_name().to_str() {
                 if filename.ends_with("diagram.txt") {
-                    eprintln!("Compiling `{}`", filename);
+                    eprintln!("Compiling `{filename}`");
                     let mut buffer = String::new();
                     fs::File::open(path.path())
                         .unwrap()
