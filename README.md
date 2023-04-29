@@ -1,6 +1,7 @@
 A small DSL to generate syntax diagrams using [this library](https://github.com/lukaslueg/railroad).
 
-[![Crates.io Version](https://img.shields.io/crates/v/railroad_dsl.svg)](https://crates.io/crates/railroad_dsl)[![Build Status](https://travis-ci.org/lukaslueg/railroad_dsl.svg?branch=master)](https://travis-ci.org/lukaslueg/railroad_dsl)
+[![Crates.io Version](https://img.shields.io/crates/v/railroad_dsl.svg)](https://crates.io/crates/railroad_dsl)
+[![Build status](https://github.com/lukaslueg/railroad_dsl/actions/workflows/check.yml/badge.svg)](https://github.com/lukaslueg/railroad_dsl/actions/workflows/check.yml)
 
 **[Some examples](https://htmlpreview.github.io/?https://github.com/lukaslueg/railroad_dsl/blob/master/examples/example_diagrams.html)**
 
