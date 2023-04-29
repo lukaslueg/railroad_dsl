@@ -12,7 +12,7 @@ struct RRParser;
 pub struct Diagram {
     pub width: i64,
     pub height: i64,
-    pub diagram: rr::Diagram<Box<dyn rr::RailroadNode>>,
+    pub diagram: rr::Diagram<Box<dyn rr::Node>>,
 }
 
 fn unescape(pair: &Pair<'_, Rule>) -> String {
@@ -28,10 +28,10 @@ fn unescape(pair: &Pair<'_, Rule>) -> String {
     result
 }
 
-fn binary<F, T>(pair: Pair<'_, Rule>, f: F) -> Box<dyn rr::RailroadNode>
+fn binary<F, T>(pair: Pair<'_, Rule>, f: F) -> Box<dyn rr::Node>
 where
-    T: rr::RailroadNode + 'static,
-    F: FnOnce(Box<dyn rr::RailroadNode>, Pair<'_, Rule>) -> T,
+    T: rr::Node + 'static,
+    F: FnOnce(Box<dyn rr::Node>, Pair<'_, Rule>) -> T,
 {
     let mut inner = pair.into_inner();
     let node = make_node(inner.next().expect("pair cannot be empty"));
@@ -42,7 +42,7 @@ where
     }
 }
 
-fn make_node(pair: Pair<'_, Rule>) -> Box<dyn rr::RailroadNode> {
+fn make_node(pair: Pair<'_, Rule>) -> Box<dyn rr::Node> {
     use Rule::*;
     match pair.as_rule() {
         term => Box::new(rr::Terminal::new(unescape(&pair))),
@@ -65,9 +65,9 @@ fn make_node(pair: Pair<'_, Rule>) -> Box<dyn rr::RailroadNode> {
     }
 }
 
-fn start_to_end(root: Box<dyn rr::RailroadNode>) -> Box<dyn rr::RailroadNode> {
+fn start_to_end(root: Box<dyn rr::Node>) -> Box<dyn rr::Node> {
     Box::new(rr::Sequence::new(vec![
-        Box::new(rr::SimpleStart),
+        Box::new(rr::SimpleStart) as Box<dyn rr::Node>,
         root,
         Box::new(rr::SimpleEnd),
     ]))
@@ -83,8 +83,8 @@ pub fn compile(src: &str) -> Result<Diagram, Box<pest::error::Error<Rule>>> {
         Box::new(rr::VerticalGrid::new(trees))
     };
     let diagram = rr::Diagram::with_default_css(root);
-    let width = (&diagram as &dyn rr::RailroadNode).width();
-    let height = (&diagram as &dyn rr::RailroadNode).height();
+    let width = (&diagram as &dyn rr::Node).width();
+    let height = (&diagram as &dyn rr::Node).height();
     Ok(Diagram {
         width,
         height,
