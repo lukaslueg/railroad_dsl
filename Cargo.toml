@@ -12,7 +12,7 @@ edition = "2018"
 [dependencies]
 pest = "2.0"
 pest_derive = "2.0"
-structopt = "0.2.12"
+structopt = "0.3"
 railroad = "0.1"
 
 [dev-dependencies]
