@@ -125,7 +125,7 @@ mod tests {
                         .unwrap()
                         .read_to_string(&mut buffer)
                         .unwrap();
-                    if let Err(e) = compile(&buffer) {
+                    if let Err(e) = compile(&buffer, None) {
                         panic!("Failed to compile {}", e.with_path(filename));
                     }
                 }
