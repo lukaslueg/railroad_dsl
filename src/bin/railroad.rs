@@ -10,9 +10,10 @@ use std::path::PathBuf;
     author,
     version,
     about,
-    long_about = "If no input files ares given, act as a \
-pipe from stdin to stdout. Otherwise, process each input file into an output files with \
-the file extension replaced by `.svg`"
+    long_about = "A small DSL to generate syntax-diagrams.
+
+If no input files are given, act as a  pipe from stdin to stdout. Otherwise, \
+process each input file into an output file with the file extension replaced by `.svg`"
 )]
 struct Options {
     // Input files to process
