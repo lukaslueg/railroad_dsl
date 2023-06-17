@@ -10,8 +10,8 @@ readme = "README.md"
 edition = "2021"
 
 [dependencies]
-pest = "2.0"
-pest_derive = "2.0"
+pest = "2.6"
+pest_derive = "2.6"
 structopt = "0.3"
 railroad = "0.2"
 
