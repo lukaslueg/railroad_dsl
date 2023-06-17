@@ -32,3 +32,7 @@ For example:
 ```
 
 ![diagram for constraint syntax](https://raw.githubusercontent.com/lukaslueg/railroad_dsl/master/examples/column_constraint.jpeg)
+
+---
+
+Use the `--css` option to provide an alternative CSS scheme; the library's [default CSS](https://docs.rs/railroad/latest/railroad/constant.DEFAULT_CSS.html#) is used if none is provided.
