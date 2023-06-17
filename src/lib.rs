@@ -4,6 +4,7 @@ use railroad as rr;
 
 use pest::iterators::Pair;
 use pest::Parser;
+use railroad::svg;
 
 #[derive(Parser)]
 #[grammar = "parser.pest"]
@@ -73,7 +74,7 @@ fn start_to_end(root: Box<dyn rr::Node>) -> Box<dyn rr::Node> {
     ]))
 }
 
-pub fn compile(src: &str) -> Result<Diagram, Box<pest::error::Error<Rule>>> {
+pub fn compile(src: &str, css: &str) -> Result<Diagram, Box<pest::error::Error<Rule>>> {
     let mut result = RRParser::parse(Rule::input, src)?;
     let trees = result.next().expect("expected root_expr").into_inner();
     let mut trees: Vec<_> = trees.map(|p| start_to_end(make_node(p))).collect();
@@ -82,7 +83,14 @@ pub fn compile(src: &str) -> Result<Diagram, Box<pest::error::Error<Rule>>> {
     } else {
         Box::new(rr::VerticalGrid::new(trees))
     };
-    let diagram = rr::Diagram::with_default_css(root);
+
+    let mut diagram = rr::Diagram::new(root);
+    diagram.add_element(
+        svg::Element::new("style")
+            .set("type", "text/css")
+            .raw_text(css),
+    );
+
     let width = (&diagram as &dyn rr::Node).width();
     let height = (&diagram as &dyn rr::Node).height();
     Ok(Diagram {
@@ -95,6 +103,7 @@ pub fn compile(src: &str) -> Result<Diagram, Box<pest::error::Error<Rule>>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use railroad::DEFAULT_CSS;
     use std::env;
     use std::fs;
     use std::io::Read;
@@ -114,7 +123,7 @@ mod tests {
                         .unwrap()
                         .read_to_string(&mut buffer)
                         .unwrap();
-                    if let Err(e) = compile(&buffer) {
+                    if let Err(e) = compile(&buffer, DEFAULT_CSS) {
                         panic!("Failed to compile {}", e.with_path(filename));
                     }
                 }
