@@ -1,3 +1,4 @@
+use railroad::DEFAULT_CSS;
 use std::fs;
 use std::io::{self, Read};
 use std::path::PathBuf;
@@ -25,23 +26,14 @@ enum Error {
     IO(io::Error),
 }
 
-fn read_css(css: &Option<PathBuf>) -> Result<Option<String>, Error> {
-    if let Some(f) = css {
-        let css = fs::read_to_string(f).map_err(Error::IO)?;
-        Ok(Some(css))
-    } else {
-        Ok(None)
-    }
-}
-
-fn dia_from_stdin(css: Option<String>) -> Result<(), Error> {
+fn dia_from_stdin(css: &str) -> Result<(), Error> {
     let mut buf = String::new();
     match io::stdin().read_to_string(&mut buf) {
         Err(e) => {
             eprintln!("error reading stdin: {e}");
             Err(Error::IO(e))
         }
-        Ok(_) => match railroad_dsl::compile(&buf, css.as_deref()) {
+        Ok(_) => match railroad_dsl::compile(&buf, css) {
             Err(e) => {
                 eprintln!("syntax error:\n{}", e.clone().with_path("<stdin>"));
                 Err(Error::Parser(e))
@@ -54,7 +46,7 @@ fn dia_from_stdin(css: Option<String>) -> Result<(), Error> {
     }
 }
 
-fn dia_from_files(inputs: &[String], css: Option<String>) -> Result<(), Error> {
+fn dia_from_files(inputs: &[String], css: &str) -> Result<(), Error> {
     let mut err = Ok(());
     for input in inputs {
         let output = PathBuf::from(&input).with_extension("svg");
@@ -63,7 +55,7 @@ fn dia_from_files(inputs: &[String], css: Option<String>) -> Result<(), Error> {
                 eprintln!("error reading file {input}: {e}");
                 err = Err(Error::IO(e));
             }
-            Ok(buf) => match railroad_dsl::compile(&buf, css.as_deref()) {
+            Ok(buf) => match railroad_dsl::compile(&buf, css) {
                 Err(e) => {
                     eprintln!("syntax error:\n{}", e.clone().with_path(input));
                     err = Err(Error::Parser(e));
@@ -81,11 +73,17 @@ fn dia_from_files(inputs: &[String], css: Option<String>) -> Result<(), Error> {
 }
 
 fn run(args: &Options) -> Result<(), Error> {
-    let css = read_css(&args.css)?;
+    let css = args
+        .css
+        .as_deref()
+        .map(|f| fs::read_to_string(f))
+        .unwrap_or_else(|| Ok(DEFAULT_CSS.to_string()))
+        .map_err(Error::IO)?;
+
     if args.inputs.is_empty() {
-        dia_from_stdin(css)
+        dia_from_stdin(&css)
     } else {
-        dia_from_files(&args.inputs, css)
+        dia_from_files(&args.inputs, &css)
     }
 }
 
