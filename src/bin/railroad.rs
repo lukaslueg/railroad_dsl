@@ -1,4 +1,5 @@
 use railroad::DEFAULT_CSS;
+use std::borrow;
 use std::fs;
 use std::io::{self, Read};
 use std::path::PathBuf;
@@ -76,8 +77,8 @@ fn run(args: &Options) -> Result<(), Error> {
     let css = args
         .css
         .as_deref()
-        .map(|f| fs::read_to_string(f))
-        .unwrap_or_else(|| Ok(DEFAULT_CSS.to_string()))
+        .map(|f| fs::read_to_string(f).map(borrow::Cow::Owned))
+        .unwrap_or_else(|| Ok(borrow::Cow::Borrowed(DEFAULT_CSS)))
         .map_err(Error::IO)?;
 
     if args.inputs.is_empty() {
