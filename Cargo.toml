@@ -13,7 +13,4 @@ edition = "2021"
 pest = "2.6"
 pest_derive = "2.6"
 clap = { version = "4.3", features = ["derive"]}
-railroad = "0.2"
-
-[dev-dependencies]
-htmlescape = "0.3"
+railroad = "0.3"

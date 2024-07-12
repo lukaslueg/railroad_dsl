@@ -1,4 +1,3 @@
-use htmlescape;
 use railroad_dsl;
 
 use railroad::DEFAULT_CSS;
@@ -29,7 +28,7 @@ fn main() -> Result<(), io::Error> {
                 write!(
                     outp,
                     "<pre>{}</pre><br>",
-                    htmlescape::encode_minimal(&buffer)
+                    railroad::svg::encode_minimal(&buffer)
                 )?;
                 write!(outp, "<div style=\"width: {}px; height: auto; max-height: 100%, max-width: 100%\">{}</div>", diagram.width, diagram.diagram)?;
                 outp.write_all(b"<hr>")?;
