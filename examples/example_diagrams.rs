@@ -40,6 +40,12 @@ fn output(outname: &str, style: &railroad::Stylesheet) -> Result<(), io::Error> 
 }
 
 fn main() -> Result<(), io::Error> {
-    output("examples/example_diagrams_light.html", &railroad::Stylesheet::Light)?;
-    output("examples/example_diagrams_dark.html", &railroad::Stylesheet::Dark)
+    output(
+        "examples/example_diagrams_light.html",
+        &railroad::Stylesheet::Light,
+    )?;
+    output(
+        "examples/example_diagrams_dark.html",
+        &railroad::Stylesheet::Dark,
+    )
 }
