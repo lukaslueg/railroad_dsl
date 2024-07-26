@@ -1,6 +1,6 @@
 [package]
 name = "railroad_dsl"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["Lukas Lueg <lukas.lueg@gmail.com>"]
 license = "MIT"
 description = "A small DSL to generate syntax-diagrams"
