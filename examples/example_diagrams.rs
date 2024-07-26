@@ -1,14 +1,10 @@
 use railroad_dsl;
-
-use railroad::DEFAULT_CSS;
 use std::fs;
 use std::io;
 use std::io::{Read, Write};
 
-const OUTNAME: &str = "examples/example_diagrams.html";
-
-fn main() -> Result<(), io::Error> {
-    let mut outp = fs::File::create(OUTNAME)?;
+fn output(outname: &str, style: &railroad::Stylesheet) -> Result<(), io::Error> {
+    let mut outp = fs::File::create(outname)?;
     outp.write_all(b"<html>")?;
 
     let mut paths = fs::read_dir("./examples")?
@@ -23,7 +19,7 @@ fn main() -> Result<(), io::Error> {
                 println!("Generating from `{}`", filename);
                 let mut buffer = String::new();
                 fs::File::open(path.path())?.read_to_string(&mut buffer)?;
-                let diagram = railroad_dsl::compile(&buffer, DEFAULT_CSS).unwrap();
+                let diagram = railroad_dsl::compile(&buffer, style.stylesheet()).unwrap();
                 write!(outp, "<h3>Generated from <i>`{}`</i></h3>", filename)?;
                 write!(
                     outp,
@@ -38,7 +34,12 @@ fn main() -> Result<(), io::Error> {
 
     outp.write_all(b"</html>")?;
 
-    println!("Written result to `{OUTNAME}`");
+    println!("Written result to `{outname}`");
 
     Ok(())
+}
+
+fn main() -> Result<(), io::Error> {
+    output("examples/example_diagrams_light.html", &railroad::Stylesheet::Light)?;
+    output("examples/example_diagrams_dark.html", &railroad::Stylesheet::Dark)
 }

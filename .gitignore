@@ -1,5 +1,7 @@
-
 /target
 **/*.rs.bk
 Cargo.lock
-examples/example_diagrams.html
+examples/example_diagrams_light.html
+examples/example_diagrams_dark.html
+examples/*.png
+examples/*.svg

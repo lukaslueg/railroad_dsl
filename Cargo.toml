@@ -4,7 +4,7 @@ version = "0.2.1"
 authors = ["Lukas Lueg <lukas.lueg@gmail.com>"]
 license = "MIT"
 description = "A small DSL to generate syntax-diagrams"
-exclude = ["examples/*.html", "examples/*.jpeg"]
+exclude = ["examples/*.html", "examples/*.jpeg", "examples/*.png", "examples/*.svg"]
 repository = "https://github.com/lukaslueg/railroad_dsl"
 readme = "README.md"
 edition = "2021"
@@ -13,4 +13,4 @@ edition = "2021"
 pest = "2.6"
 pest_derive = "2.6"
 clap = { version = "4.3", features = ["derive"]}
-railroad = "0.3"
+railroad = { version="0.3.2", features = [ "resvg" ]}
