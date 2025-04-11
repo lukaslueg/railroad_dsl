@@ -10,6 +10,45 @@ use railroad::svg;
 #[grammar = "parser.pest"]
 struct RRParser;
 
+pub struct Except {
+    inner: rr::LabeledBox<Box<dyn rr::Node>, Box<dyn rr::Node>>,
+}
+
+impl Except {
+    fn new(inner: Box<dyn rr::Node>, label: Box<dyn rr::Node>) -> Self {
+        let grid = Box::new(rr::VerticalGrid::new(vec![
+            Box::new(rr::Comment::new("⚠️ with the exception of".to_owned())) as Box<dyn rr::Node>,
+            label,
+        ])) as Box<dyn rr::Node>;
+        let mut this = Self {
+            inner: rr::LabeledBox::new(inner, grid),
+        };
+        this.inner
+            .attr("class".to_owned())
+            .or_default()
+            .push_str(" exceptbox");
+        this
+    }
+}
+
+impl rr::Node for Except {
+    fn entry_height(&self) -> i64 {
+        self.inner.entry_height()
+    }
+
+    fn height(&self) -> i64 {
+        self.inner.height()
+    }
+
+    fn width(&self) -> i64 {
+        self.inner.width()
+    }
+
+    fn draw(&self, x: i64, y: i64, h_dir: svg::HDir) -> svg::Element {
+        self.inner.draw(x, y, h_dir)
+    }
+}
+
 pub struct Diagram {
     pub width: i64,
     pub height: i64,
@@ -62,6 +101,7 @@ fn make_node(pair: Pair<'_, Rule>) -> Box<dyn rr::Node> {
         lbox_expr => binary(pair, |first, second| {
             rr::LabeledBox::new(first, make_node(second))
         }),
+        excpt_expr => binary(pair, |first, second| Except::new(first, make_node(second))),
         _ => unreachable!(),
     }
 }
@@ -90,6 +130,14 @@ pub fn compile(src: &str, css: &str) -> Result<Diagram, Box<pest::error::Error<R
             .set("type", "text/css")
             .raw_text(css),
     );
+
+    diagram.add_element(svg::Element::new("style").set("type", "text/css").raw_text(
+        r#"
+svg.railroad g.exceptbox > rect {
+    fill:rgba(245, 160, 125, .1);
+}
+                "#,
+    ));
 
     let width = (&diagram as &dyn rr::Node).width();
     let height = (&diagram as &dyn rr::Node).height();

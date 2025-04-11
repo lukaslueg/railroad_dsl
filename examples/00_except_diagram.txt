@@ -1,0 +1,1 @@
+['CHAR'^<"/", "!", 'LF'> '42'#`The ultimate answer`]
